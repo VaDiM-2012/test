@@ -32,22 +32,12 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       SERVER_PORT: 9090
       SERVER_ADDRESS: 0.0.0.0
-      # Добавляем debug переменные
-      SPRING_PROFILES_ACTIVE: debug
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK: DEBUG
-      LOGGING_LEVEL_COM_YOUR_APP: DEBUG
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:9090 || curl -f http://localhost:9090/actuator/health || nc -z localhost 9090 || exit 1" ]
+      test: ["CMD", "curl", "-f", "http://localhost:9090/actuator/health"]
       interval: 10s
       timeout: 5s
-      retries: 20
-      start_period: 90s  # Увеличиваем время на старт
-    # Добавляем команду для логирования
-    command: >
-      sh -c "
-      echo 'Starting stats-server...'
-      java -jar /app/app.jar 2>&1 | tee /tmp/app.log
-      "
+      retries: 12
+      start_period: 30s
 
 #  ewm-service:
 #    ports:
