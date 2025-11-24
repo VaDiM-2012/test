@@ -1,7 +1,9 @@
+# Dockerfile — в корне проекта
 FROM eclipse-temurin:21-jdk-jammy AS builder
 WORKDIR /app
 COPY . .
 
+# Сборка через Maven (с fallback на apt, если mvnw нет)
 RUN if [ -f mvnw ]; then \
         chmod +x mvnw && ./mvnw clean package -DskipTests -pl :stats-server --also-make; \
     else \
@@ -9,11 +11,14 @@ RUN if [ -f mvnw ]; then \
         mvn clean package -DskipTests -pl :stats-server --also-make; \
     fi
 
+# Финальный образ
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
-# Самый надёжный вариант — копируем jar с точным именем
-COPY --from=builder /app/ewm-stats-service/stats-server/target/stats-server-0.0.1-SNAPSHOT.jar app.jar
+# Копируем ТОЛЬКО исполняемый jar (без .original в имени)
+COPY --from=builder \
+    /app/ewm-stats-service/stats-server/target/stats-server-0.0.1-SNAPSHOT.jar \
+    /app/app.jar
 
 EXPOSE 9090
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
