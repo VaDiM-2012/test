@@ -18,11 +18,11 @@ services:
 
   stats-server:
     build:
-      context: ./ewm-stats-service/stats-server
-      dockerfile: Dockerfile
+      context: .                  # теперь контекст — корень репозитория
+      dockerfile: Dockerfile      # используем Dockerfile из корня
     container_name: stats-server
     ports:
-      - "0.0.0.0:9090:9090"
+      - "9090:9090"
     depends_on:
       stats-db:
         condition: service_healthy
@@ -31,13 +31,6 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SERVER_PORT: 9090
-      SERVER_ADDRESS: 0.0.0.0
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9090/actuator/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 12
-      start_period: 30s
 
 #  ewm-service:
 #    ports:
